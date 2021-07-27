@@ -2,6 +2,7 @@
 using ProjectUser.Models.ViewModel;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -10,20 +11,18 @@ namespace ProjectUser.Controllers
 {
     public class ProductController : Controller
     {
-        // GET: Product
+        // GET: Product    
         Product_categoryEntities _db = new Product_categoryEntities();
 
         public ActionResult ManageProduct()
         {
-            List<ProductViewModel> lpvm = new List<ProductViewModel>();
-            var products = _db.tblProducts.ToList();
+            List<ProductViewModel> pvm = new List<ProductViewModel>();
+            var products = _db.tblProducts.Include("tblCategory").ToList();
             foreach (var item in products)
             {
-                lpvm.Add(new ProductViewModel() { ProductId=item.ProductId,CategoryName=item.
-                    tblCategory.CategoryName,ProductName=item.ProductName,UnitPrice=item
-                    .UnitPrice,SellingPrice=item.SellingPrice,Photo=item.Photo});
+                pvm.Add(new ProductViewModel() { ProductId=item.ProductId,CategoryName=item.tblCategory.CategoryName,ProductName=item.ProductName,UnitPrice=item.UnitPrice,SellingPrice=item.SellingPrice,Photo=item.Photo});
             }
-            return View(lpvm);
+            return View(pvm);
         }
         public ActionResult Create()
         {
@@ -63,7 +62,6 @@ namespace ProjectUser.Controllers
             pvm.UnitPrice = products.UnitPrice;
             pvm.SellingPrice = products.SellingPrice;
             pvm.Photo = products.Photo;
-            _db.SaveChanges();
 
             ViewBag.Categories = _db.tblCategories.ToList();
             return View(pvm);
@@ -82,7 +80,7 @@ namespace ProjectUser.Controllers
             {
                 if (fup.FileName != "")
                 {
-                    System.IO.File.Delete(Server.MapPath("~/ProductImages/" + fup.FileName));
+                    System.IO.File.Delete(Server.MapPath("~/ProductImages/" + pvm.Photo));
                     products.Photo = fup.FileName;
                     fup.SaveAs(Server.MapPath("~/ProductImages/" + fup.FileName));
                 } 
