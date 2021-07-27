@@ -265,6 +265,7 @@
     <Content Include="Views\Admin\Dashboard.cshtml" />
     <Content Include="Views\Product\Create.cshtml" />
     <Content Include="Views\Product\ManageProduct.cshtml" />
+    <Content Include="Views\Product\Edit.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />

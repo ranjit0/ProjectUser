@@ -42,8 +42,9 @@ namespace ProjectUser.Controllers
             HttpPostedFileBase fup = Request.Files["Photo"];
             if (fup != null)
             {
-                tb.Photo = fup.FileName;
+            
                 fup.SaveAs(Server.MapPath("~/ProductImages/" + fup.FileName));
+                tb.Photo = fup.FileName;
             }
             _db.tblProducts.Add(tb);
             _db.SaveChanges();
@@ -51,6 +52,46 @@ namespace ProjectUser.Controllers
             ViewBag.Categories = _db.tblCategories.ToList();
 
             return View();
+        }
+        public ActionResult Edit(int id)
+        {
+            var products=_db.tblProducts.Where(p=>p.ProductId==id).FirstOrDefault();
+            ProductViewModel pvm = new ProductViewModel();
+            pvm.ProductId = products.ProductId;
+            pvm.CategoryId = products.CategoryId;
+            pvm.ProductName = products.ProductName;
+            pvm.UnitPrice = products.UnitPrice;
+            pvm.SellingPrice = products.SellingPrice;
+            pvm.Photo = products.Photo;
+            _db.SaveChanges();
+
+            ViewBag.Categories = _db.tblCategories.ToList();
+            return View(pvm);
+                
+        }
+        [HttpPost]
+        public ActionResult Edit(ProductViewModel pvm)
+        {
+            var products = _db.tblProducts.Where(p => p.ProductId == pvm.ProductId).FirstOrDefault();
+            products.CategoryId = pvm.CategoryId;
+            products.ProductName = pvm.ProductName;
+            products.SellingPrice = pvm.SellingPrice;
+            products.UnitPrice = pvm.UnitPrice;
+            HttpPostedFileBase fup = Request.Files["Photo"];
+            if (fup != null)
+            {
+                if (fup.FileName != "")
+                {
+                    System.IO.File.Delete(Server.MapPath("~/ProductImages/" + fup.FileName));
+                    products.Photo = fup.FileName;
+                    fup.SaveAs(Server.MapPath("~/ProductImages/" + fup.FileName));
+                } 
+            }
+            _db.SaveChanges();
+
+            ViewBag.Categories = _db.tblCategories.ToList();
+            return RedirectToAction("ManageProduct");
+            
         }
     }
 }
